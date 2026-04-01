@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: weibo
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      # 整个请求（包含所有文件和表单数据）的最大大小（默认10MB）
+      max-request-size: 100MB
+server:
+  port: 8080
+  servlet:
+    context-path: /
