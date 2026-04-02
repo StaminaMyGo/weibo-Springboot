@@ -8,16 +8,18 @@ import com.wei.it.weibo.web.dto.RespEntity;
 import com.wei.it.weibo.web.dto.UserDto;
 import com.wei.it.weibo.service.UserService;
 
+import io.jsonwebtoken.JwtBuilder;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController  // 改为 @RestController，这样所有方法默认都有 @ResponseBody
 public class UserController {
@@ -57,6 +59,8 @@ public class UserController {
         System.out.println("捕获到未知请求: " + request.getRequestURI());
         return new RespEntity(404, "接口不存在: " + request.getRequestURI(), null);
     }
+    @Value("${my.jwt_pwd}")
+    private String jwtPwd="";
 
     /**
      * 用户登录
@@ -86,11 +90,33 @@ public class UserController {
         System.out.println("查询结果: " + (user != null ? "找到用户" : "未找到用户"));
 
         if (user != null) {
-            user.setLoginPwd(null);  // 清除密码，安全考虑
-            RespEntity successResp = new RespEntity(2000, "登录成功",  new UserDto(user));
-            System.out.println("准备返回成功响应: code=" + successResp.getCode() + ", msg=" + successResp.getMsg());
-            System.out.println("响应对象: " + successResp);
-            return successResp;
+//            user.setLoginPwd(null);  // 清除密码，安全考虑
+//            RespEntity successResp = new RespEntity(2000, "登录成功",  new UserDto(user));
+//            System.out.println("准备返回成功响应: code=" + successResp.getCode() + ", msg=" + successResp.getMsg());
+//            System.out.println("响应对象: " + successResp);
+//            return successResp;
+            //向浏览器派发一个Jwt凭证，日后凭此凭证证明身份
+            JwtBuilder builder = Jwts.builder();
+            builder.setId(UUID.randomUUID().toString());
+            builder.setIssuedAt(new Date());//凭证派发的时间
+            builder.setExpiration(new Date(System.currentTimeMillis()+1000*60*60*24));
+            builder.signWith(SignatureAlgorithm.HS256,this.jwtPwd);
+            builder.setSubject(user.getId()+"");
+            builder.setClaims(
+                    Map.of("id",user.getId()
+                            ,"nickName",user.getNickName()
+                            ,"loginName",user.getLoginName()
+                            ,"email",user.getPhoto()
+                            ,"score" ,user.getScore()
+                            ,"attionCount",user.getAttentionCount()
+                    ));
+
+            String jwttoken=builder.compact();
+            System.out.println( jwttoken);
+
+            UserDto dto = new UserDto(user);
+            dto.setToken(jwttoken);
+            return new RespEntity(2004,"登录成功",dto);
         }
 
         return new RespEntity(4001, "用户名或密码错误", null);

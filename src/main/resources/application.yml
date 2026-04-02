@@ -1,3 +1,5 @@
+my:
+  jwt_pwd: abc123
 spring:
   application:
     name: weibo
