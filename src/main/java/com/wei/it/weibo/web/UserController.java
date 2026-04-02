@@ -1,10 +1,13 @@
 package com.wei.it.weibo.web;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.wei.it.weibo.entity.User;
 import com.wei.it.weibo.mapper.UserMapper;
 import com.wei.it.weibo.web.dto.RespEntity;
 import com.wei.it.weibo.web.dto.UserDto;
+import com.wei.it.weibo.service.UserService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -13,13 +16,38 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController  // 改为 @RestController，这样所有方法默认都有 @ResponseBody
 public class UserController {
 
     @Autowired
-    private UserMapper userMapper;
+    private UserService userService;
+
+//    @Autowired
+//    private UserMapper userMapper;
+    @GetMapping("users/page")
+    public RespEntity usrPage(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "" ) String find
+    ){
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.like(!find.isEmpty(),"user_nickname",find);
+        queryWrapper.orderByDesc("user_nickname");
+        Page<User> pageInfo = new Page<>(page,2);
+        userService.page(pageInfo,queryWrapper);
+
+        return new RespEntity(2003,"查询成功",pageInfo);
+    }
+
+
+    @GetMapping("/users/list")
+    public RespEntity getUserList() {
+        // List<User> list=userMapper.selectList(new QueryWrapper<>());
+        List<User> list = userService.list(new QueryWrapper<>());
+        return new RespEntity( 2000, "查询成功", list);
+    }
 
     /**
      * 处理所有未匹配的请求，返回404错误
@@ -41,7 +69,7 @@ public class UserController {
         System.out.println("password: " + password);
 
         if (username == null || username.trim().isEmpty()) {
-            return new RespEntity(4001, "用户名不能为空", null);
+            return new RespEntity(4001, "用户名不能为空",null);
         }
         if (password == null || password.trim().isEmpty()) {
             return new RespEntity(4001, "密码不能为空", null);
@@ -52,13 +80,14 @@ public class UserController {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("user_loginname", username);
         queryWrapper.eq("user_loginpwd", password);
-        User user = userMapper.selectOne(queryWrapper);
+        // userMapper.SelectOne(queryWrapper)
+        User user = userService.getOne(queryWrapper);
 
         System.out.println("查询结果: " + (user != null ? "找到用户" : "未找到用户"));
 
         if (user != null) {
             user.setLoginPwd(null);  // 清除密码，安全考虑
-            RespEntity successResp = new RespEntity(2000, "登录成功", user);
+            RespEntity successResp = new RespEntity(2000, "登录成功",  new UserDto(user));
             System.out.println("准备返回成功响应: code=" + successResp.getCode() + ", msg=" + successResp.getMsg());
             System.out.println("响应对象: " + successResp);
             return successResp;
@@ -75,7 +104,9 @@ public class UserController {
         // 检查用户名是否已存在
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("user_loginname", user.getLoginName());
-        User existingUser = userMapper.selectOne(queryWrapper);
+//        User existingUser = userMapper.SelectOne(queryWrapper);
+
+        User existingUser = userService.getOne(queryWrapper);
 
         if (existingUser != null) {
             return new RespEntity(4000, "此用户名已存在，不允许注册", null);
@@ -86,7 +117,8 @@ public class UserController {
         user.setAttentionCount(0);
 
         // 插入用户
-        userMapper.insert(user);
+//        userMapper.insert(user);
+        userService.save(user);
 
         // 清除密码后返回
         user.setLoginPwd("");
