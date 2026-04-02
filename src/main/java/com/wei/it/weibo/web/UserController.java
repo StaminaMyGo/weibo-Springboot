@@ -29,23 +29,34 @@ public class UserController {
 
 //    @Autowired
 //    private UserMapper userMapper;
-    @GetMapping("users/page")
+    @GetMapping(value = "/api/v1/g/users",params = {"pageNum"})
     public RespEntity usrPage(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "" ) String find
+//            HttpServletRequest request
     ){
+//        User u=(User)request.getAttribute("auth");
+//        if(u==null){
+//            return new RespEntity(4001,"请先登录",null);
+//        }
+
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.like(!find.isEmpty(),"user_nickname",find);
         queryWrapper.orderByDesc("user_nickname");
         Page<User> pageInfo = new Page<>(page,2);
         userService.page(pageInfo,queryWrapper);
+        pageInfo.setRecords(UserDto.dtoList(pageInfo.getRecords()));
 
         return new RespEntity(2003,"查询成功",pageInfo);
     }
 
 
-    @GetMapping("/users/list")
+    @GetMapping("/api/v1/g/users")
     public RespEntity getUserList() {
+//        User u=(User)request.getAttribute("auth");
+//        if(u==null){
+//            return new RespEntity(4001,"请先登录",null);
+//        }
         // List<User> list=userMapper.selectList(new QueryWrapper<>());
         List<User> list = userService.list(new QueryWrapper<>());
         return new RespEntity( 2000, "查询成功", list);
@@ -65,7 +76,7 @@ public class UserController {
     /**
      * 用户登录
      */
-    @PostMapping("/users/login")
+    @PostMapping("/api/v1/login")
     public RespEntity login(@RequestParam String username, @RequestParam String password) {
         // 1. 参数校验
         System.out.println("========== 登录请求到达 ==========");
@@ -125,7 +136,7 @@ public class UserController {
     /**
      * 用户注册
      */
-    @PostMapping("/users/reg")
+    @PostMapping("/api/v1/reg")
     public RespEntity register(@RequestBody User user) {
         // 检查用户名是否已存在
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();

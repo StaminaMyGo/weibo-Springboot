@@ -1,9 +1,14 @@
 package com.wei.it.weibo.web.dto;
 import com.wei.it.weibo.entity.User;
+
+import java.util.List;
+
 public class UserDto extends User {
     private String token="";
 
-
+    public static List dtoList(List<User> users){
+        return users.stream().map((x)->{return new UserDto(x);}).toList();
+    }
     public UserDto(){}
     public UserDto(User user){
         this.setId(user.getId());
