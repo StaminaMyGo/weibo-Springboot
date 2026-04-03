@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.*;
 
 @RestController  // 改为 @RestController，这样所有方法默认都有 @ResponseBody
+@RequestMapping("/api/v1")
 public class UserController {
 
     @Autowired
@@ -29,7 +30,7 @@ public class UserController {
 
 //    @Autowired
 //    private UserMapper userMapper;
-    @GetMapping(value = "/api/v1/g/users",params = {"pageNum"})
+    @GetMapping(value = "/g/users",params = {"pageNum"})
     public RespEntity usrPage(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "" ) String find
@@ -51,7 +52,7 @@ public class UserController {
     }
 
 
-    @GetMapping("/api/v1/g/users")
+    @GetMapping("/g/users")
     public RespEntity getUserList() {
 //        User u=(User)request.getAttribute("auth");
 //        if(u==null){
@@ -76,7 +77,7 @@ public class UserController {
     /**
      * 用户登录
      */
-    @PostMapping("/api/v1/login")
+    @PostMapping("/login")
     public RespEntity login(@RequestParam String username, @RequestParam String password) {
         // 1. 参数校验
         System.out.println("========== 登录请求到达 ==========");
@@ -136,7 +137,7 @@ public class UserController {
     /**
      * 用户注册
      */
-    @PostMapping("/api/v1/reg")
+    @PostMapping("/reg")
     public RespEntity register(@RequestBody User user) {
         // 检查用户名是否已存在
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
@@ -162,102 +163,7 @@ public class UserController {
         return new RespEntity(2002, "注册成功", user);
     }
 
-    /**
-     * 测试接口 - 返回JSON字符串
-     */
-    @GetMapping(value = "/my/hello", produces = "application/json")
-    public String hello() {
-        return """
-                {
-                    "code": "200",
-                    "msg": "Hello World!",
-                    "data": {
-                        "name": "张三",
-                        "age": 23
-                    }
-                }
-                """;
-    }
 
-    /**
-     * 测试接口 - 返回Map
-     */
-    @GetMapping("/my/hello2")
-    public Map<String, Object> hello2() {
-        Map<String, Object> map = new HashMap<>();
-        map.put("code", "2000");
-        map.put("msg", "Hello World!");
-        map.put("data", Map.of("name", "lisi", "age", 23));
-        return map;
-    }
 
-    /**
-     * 测试接口 - 返回RespEntity
-     */
-    @GetMapping("/my/hello3")
-    public RespEntity hello3() {
-        return new RespEntity(2000, "helloworld", Map.of("name", "lisi", "age", 23));
-    }
 
-    /**
-     * 测试接口 - 带默认值的参数
-     */
-    @GetMapping("/my/test0")
-    public RespEntity test0(@RequestParam(value = "name", defaultValue = "no name") String name,
-                            @RequestParam int age) {
-        System.out.println("name:" + name + " " + "age:" + age);
-        return new RespEntity(2000, "success!", null);
-    }
-
-    /**
-     * 测试接口 - 多个参数
-     */
-    @GetMapping("/my/test02")
-    public RespEntity test02(@RequestParam(value = "page", defaultValue = "1") int page,
-                             @RequestParam(value = "find", defaultValue = "") String find) {
-        return new RespEntity(2001, "successfully insert page!",
-                "page:" + page + " " + "find:" + find);
-    }
-
-    /**
-     * 测试接口 - 接收Map
-     */
-    @PostMapping("/my/test03")
-    public RespEntity test03(@RequestBody Map<String, Object> map) {
-        String nickName = (String) map.get("nickName");
-        String loginName = (String) map.get("loginName");
-        String loginPwd = (String) map.get("loginPwd");
-
-        return new RespEntity(2000, "sign up!",
-                nickName + " " + loginName + " " + loginPwd);
-    }
-
-    /**
-     * 测试接口 - 接收UserDto对象
-     */
-    @PostMapping("/my/test04")
-    public RespEntity test04(@RequestBody UserDto user) {
-        return new RespEntity(2000, "注册成功",
-                user.getNickName() + user.getLoginName() + user.getLoginPwd());
-    }
-
-    /**
-     * 测试接口 - 文件上传
-     */
-    @PostMapping("/my/test05")
-    public RespEntity test05(String title,
-                             String content,
-                             @RequestParam("imgFile") MultipartFile imgFile) throws IOException {
-        System.out.println("title:" + title + " " + "content:" + content +
-                " imgFile:" + imgFile.getOriginalFilename());
-
-        // 保存图片
-        if (!imgFile.isEmpty()) {
-            imgFile.transferTo(new File("F:/" + imgFile.getOriginalFilename()));
-        }
-
-        return new RespEntity(2000, "test05 success!",
-                "title:" + title + " " + "content:" + content +
-                        " imgFile:" + imgFile.getOriginalFilename());
-    }
 }
