@@ -1,36 +1,17 @@
-package com.wei.it.weibo.entity;
+package com.wei.it.weibo.web.dto;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.wei.it.weibo.entity.User;
 import java.util.Date;
 
-@TableName("weibos")
-public class Weibo {
-    @TableId(value = "wb_id", type = IdType.AUTO)
+public class WeiboDto {
     private Integer id;
-
-    @TableField("wb_userid")
     private Integer userId;
-
-    @TableField("wb_title")
     private String title;
-
-    @TableField("wb_content")
     private String content;
-
-    @TableField("wb_createtime")
     private Date createTime;
-
-    @TableField("wb_readcount")
     private Integer readCount;
-
-    @TableField("wb_img")
     private String img;
-
-    @TableField(exist = false)
-    private User user;  // 关联的用户对象，非数据库字段
+    private User user;   // 按要求添加
 
     // getters and setters
     public Integer getId() { return id; }
