@@ -9,7 +9,7 @@ import com.wei.it.weibo.web.dto.RespEntity;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
+// all API interface have been tested
 @RestController
 @RequestMapping("/api/v1/weibo")
 public class WeiboController {
