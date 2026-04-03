@@ -40,7 +40,7 @@ public class TestController {
      */
     @GetMapping("/my/hello3")
     public RespEntity hello3() {
-        return new RespEntity(2000, "helloworld", Map.of("name", "lisi", "age", 23));
+        return RespEntity.success(2000, "helloworld", Map.of("name", "lisi", "age", 23));
     }
 
     /**
@@ -50,7 +50,7 @@ public class TestController {
     public RespEntity test0(@RequestParam(value = "name", defaultValue = "no name") String name,
                             @RequestParam int age) {
         System.out.println("name:" + name + " " + "age:" + age);
-        return new RespEntity(2000, "success!", null);
+        return RespEntity.success(2000, "success!", null);
     }
 
     /**
@@ -59,7 +59,7 @@ public class TestController {
     @GetMapping("/my/test02")
     public RespEntity test02(@RequestParam(value = "page", defaultValue = "1") int page,
                              @RequestParam(value = "find", defaultValue = "") String find) {
-        return new RespEntity(2001, "successfully insert page!",
+        return RespEntity.success(2001, "successfully insert page!",
                 "page:" + page + " " + "find:" + find);
     }
 
@@ -72,7 +72,7 @@ public class TestController {
         String loginName = (String) map.get("loginName");
         String loginPwd = (String) map.get("loginPwd");
 
-        return new RespEntity(2000, "sign up!",
+        return RespEntity.success(2000, "sign up!",
                 nickName + " " + loginName + " " + loginPwd);
     }
 
@@ -81,7 +81,7 @@ public class TestController {
      */
     @PostMapping("/my/test04")
     public RespEntity test04(@RequestBody UserDto user) {
-        return new RespEntity(2000, "注册成功",
+        return RespEntity.success(2000, "注册成功",
                 user.getNickName() + user.getLoginName() + user.getLoginPwd());
     }
 
@@ -100,7 +100,7 @@ public class TestController {
             imgFile.transferTo(new File("F:/" + imgFile.getOriginalFilename()));
         }
 
-        return new RespEntity(2000, "test05 success!",
+        return RespEntity.success(2000, "test05 success!",
                 "title:" + title + " " + "content:" + content +
                         " imgFile:" + imgFile.getOriginalFilename());
     }

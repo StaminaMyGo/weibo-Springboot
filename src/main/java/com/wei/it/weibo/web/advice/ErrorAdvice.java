@@ -10,6 +10,6 @@ public class ErrorAdvice {
     @ExceptionHandler
     @ResponseBody
     public RespEntity catchError(Exception ex){
-        return new RespEntity(5000,ex.getMessage(),null);
+        return RespEntity.error(5000,ex.getMessage(),null);
     }
 }

@@ -24,7 +24,7 @@ public class WeiboController {
             @RequestParam(defaultValue = "10") Integer size) {
         Page<Weibo> page = new Page<>(current, size);
         IPage<WeiboDto> dtoPage = weiboService.pageWithUser(page);
-        return new RespEntity(200, "success", dtoPage);
+        return RespEntity.success(dtoPage);
     }
 
     // 根据ID查询单条微博（关联用户）
@@ -32,7 +32,7 @@ public class WeiboController {
     public RespEntity getById(@PathVariable Integer id) {
         Weibo weibo = weiboService.getById(id);
         if (weibo == null) {
-            return new RespEntity(404, "微博不存在", null);
+            return RespEntity.error(404, "微博不存在", null);
         }
         WeiboDto dto = new WeiboDto();
         BeanUtils.copyProperties(weibo, dto);
@@ -41,7 +41,7 @@ public class WeiboController {
             // 需要注入 UserService，暂不扩展，保持与之前逻辑一致
             // 推荐使用 weiboService.getWeiboWithUser(id) 方法
         }
-        return new RespEntity(200, "success", dto);
+        return RespEntity.success(dto);
     }
 
     // 新增微博
@@ -49,9 +49,9 @@ public class WeiboController {
     public RespEntity add(@RequestBody Weibo weibo) {
         boolean save = weiboService.save(weibo);
         if (save) {
-            return new RespEntity(200, "success", true);
+            return RespEntity.success(true);
         } else {
-            return new RespEntity(500, "添加失败", null);
+            return RespEntity.error(500, "添加失败", null);
         }
     }
 
@@ -60,9 +60,9 @@ public class WeiboController {
     public RespEntity update(@RequestBody Weibo weibo) {
         boolean update = weiboService.updateById(weibo);
         if (update) {
-            return new RespEntity(200, "success", true);
+            return RespEntity.success(true);
         } else {
-            return new RespEntity(500, "更新失败", null);
+            return RespEntity.error(500, "更新失败", null);
         }
     }
 
@@ -71,9 +71,9 @@ public class WeiboController {
     public RespEntity delete(@PathVariable Integer id) {
         boolean remove = weiboService.removeById(id);
         if (remove) {
-            return new RespEntity(200, "success", true);
+            return  RespEntity.success(true);
         } else {
-            return new RespEntity(500, "删除失败", null);
+            return RespEntity.error(500, "删除失败", null);
         }
     }
 }

@@ -34,12 +34,7 @@ public class UserController {
     public RespEntity usrPage(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "" ) String find
-//            HttpServletRequest request
     ){
-//        User u=(User)request.getAttribute("auth");
-//        if(u==null){
-//            return new RespEntity(4001,"请先登录",null);
-//        }
 
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.like(!find.isEmpty(),"user_nickname",find);
@@ -48,19 +43,14 @@ public class UserController {
         userService.page(pageInfo,queryWrapper);
         pageInfo.setRecords(UserDto.dtoList(pageInfo.getRecords()));
 
-        return new RespEntity(2003,"查询成功",pageInfo);
+        return RespEntity.success(2003,"查询成功",pageInfo);
     }
 
 
     @GetMapping("/g/users")
     public RespEntity getUserList() {
-//        User u=(User)request.getAttribute("auth");
-//        if(u==null){
-//            return new RespEntity(4001,"请先登录",null);
-//        }
-        // List<User> list=userMapper.selectList(new QueryWrapper<>());
         List<User> list = userService.list(new QueryWrapper<>());
-        return new RespEntity( 2000, "查询成功", list);
+        return RespEntity.success( 2000, "查询成功", list);
     }
 
     /**
@@ -69,7 +59,7 @@ public class UserController {
     @RequestMapping("/**")
     public RespEntity catchAll(HttpServletRequest request) {
         System.out.println("捕获到未知请求: " + request.getRequestURI());
-        return new RespEntity(404, "接口不存在: " + request.getRequestURI(), null);
+        return RespEntity.error(404, "接口不存在: " + request.getRequestURI(), null);
     }
     @Value("${my.jwt_pwd}")
     private String jwtPwd="";
@@ -85,10 +75,10 @@ public class UserController {
         System.out.println("password: " + password);
 
         if (username == null || username.trim().isEmpty()) {
-            return new RespEntity(4001, "用户名不能为空",null);
+            return RespEntity.success(4001, "用户名不能为空",null);
         }
         if (password == null || password.trim().isEmpty()) {
-            return new RespEntity(4001, "密码不能为空", null);
+            return RespEntity.error(4001, "密码不能为空", null);
         }
 
         System.out.println("开始查询数据库...");
@@ -102,11 +92,6 @@ public class UserController {
         System.out.println("查询结果: " + (user != null ? "找到用户" : "未找到用户"));
 
         if (user != null) {
-//            user.setLoginPwd(null);  // 清除密码，安全考虑
-//            RespEntity successResp = new RespEntity(2000, "登录成功",  new UserDto(user));
-//            System.out.println("准备返回成功响应: code=" + successResp.getCode() + ", msg=" + successResp.getMsg());
-//            System.out.println("响应对象: " + successResp);
-//            return successResp;
             //向浏览器派发一个Jwt凭证，日后凭此凭证证明身份
             JwtBuilder builder = Jwts.builder();
             builder.setId(UUID.randomUUID().toString());
@@ -118,9 +103,9 @@ public class UserController {
                     Map.of("id",user.getId()
                             ,"nickName",user.getNickName()
                             ,"loginName",user.getLoginName()
-                            ,"email",user.getPhoto()
+                            ,"photo",user.getPhoto()
                             ,"score" ,user.getScore()
-                            ,"attionCount",user.getAttentionCount()
+                            ,"attentionCount",user.getAttentionCount()
                     ));
 
             String jwttoken=builder.compact();
@@ -128,10 +113,10 @@ public class UserController {
 
             UserDto dto = new UserDto(user);
             dto.setToken(jwttoken);
-            return new RespEntity(2004,"登录成功",dto);
+            return RespEntity.success(2004,"登录成功",dto);
         }
 
-        return new RespEntity(4001, "用户名或密码错误", null);
+        return RespEntity.error(4001, "用户名或密码错误", null);
     }
 
     /**
@@ -147,7 +132,7 @@ public class UserController {
         User existingUser = userService.getOne(queryWrapper);
 
         if (existingUser != null) {
-            return new RespEntity(4000, "此用户名已存在，不允许注册", null);
+            return RespEntity.error(4000, "此用户名已存在，不允许注册", null);
         }
 
         // 设置默认值
@@ -160,7 +145,7 @@ public class UserController {
 
         // 清除密码后返回
         user.setLoginPwd("");
-        return new RespEntity(2002, "注册成功", user);
+        return RespEntity.success(2002, "注册成功", user);
     }
 
 
