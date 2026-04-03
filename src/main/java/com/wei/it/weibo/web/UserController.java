@@ -99,14 +99,14 @@ public class UserController {
             builder.setExpiration(new Date(System.currentTimeMillis()+1000*60*60*24));
             builder.signWith(SignatureAlgorithm.HS256,this.jwtPwd);
             builder.setSubject(user.getId()+"");
-            builder.setClaims(
-                    Map.of("id",user.getId()
-                            ,"nickName",user.getNickName()
-                            ,"loginName",user.getLoginName()
-                            ,"photo",user.getPhoto()
-                            ,"score" ,user.getScore()
-                            ,"attentionCount",user.getAttentionCount()
-                    ));
+            builder.setClaims(Map.of(
+                    "id", user.getId(),
+                    "nickName", user.getNickName() != null ? user.getNickName() : "",
+                    "loginName", user.getLoginName() != null ? user.getLoginName() : "",
+                    "photo", user.getPhoto() != null ? user.getPhoto() : "",
+                    "score", user.getScore(),
+                    "attentionCount", user.getAttentionCount()
+            ));
 
             String jwttoken=builder.compact();
             System.out.println( jwttoken);

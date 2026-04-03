@@ -50,14 +50,26 @@ public class JwtInterceptor  implements HandlerInterceptor {
             return false;
         }
         // 获取当前登录User的对象
-
         User u = new User();
-        u.setId((Integer) claims.get("id"));
-        u.setNickName(claims.get("nickName").toString());
-        u.setLoginName(claims.get("loginName").toString());
-        u.setPhoto(claims.get("photo").toString());
-        u.setAttentionCount((Integer) claims.get("attentionCount"));
-        u.setScore((Integer) claims.get("score"));
+
+        Object idObj = claims.get("id");
+        u.setId(idObj != null ? (Integer) idObj : 0);
+
+        Object nickNameObj = claims.get("nickName");
+        u.setNickName(nickNameObj != null ? nickNameObj.toString() : "");
+
+        Object loginNameObj = claims.get("loginName");
+        u.setLoginName(loginNameObj != null ? loginNameObj.toString() : "");
+
+        Object photoObj = claims.get("photo");
+        u.setPhoto(photoObj != null ? photoObj.toString() : "");
+
+        Object attentionCountObj = claims.get("attentionCount");
+        u.setAttentionCount(attentionCountObj != null ? (Integer) attentionCountObj : 0);
+
+        Object scoreObj = claims.get("score");
+        u.setScore(scoreObj != null ? (Integer) scoreObj : 0);
+
         request.setAttribute("auth", u);
 
 
